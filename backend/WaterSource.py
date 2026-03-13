@@ -1,5 +1,5 @@
 class WaterSource:
-    INSTANCE: WaterSource
+    INSTANCE = None
 
     def __init__(self):
         WaterSource.INSTANCE = self
