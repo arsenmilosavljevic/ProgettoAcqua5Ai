@@ -1,5 +1,5 @@
 import pygame
-from scenes.bad_ending_scene import BadEnding
+from frontend.scenes.bad_ending_scene import BadEnding
 
 class WarScene:
 

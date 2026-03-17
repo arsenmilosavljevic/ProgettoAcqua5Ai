@@ -1,4 +1,4 @@
-from backend import TimeLapse
+from backend.TimeLapse import TimeLapse
 
 
 

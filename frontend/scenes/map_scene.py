@@ -1,20 +1,24 @@
 import pygame
-from ui.water_bar import WaterBar
-from sprites.character import Character
-from settings import *
+from frontend.ui.water_bar import WaterBar
+from frontend.sprites.character import Character
+from frontend.settings import *
+
+from pathlib import Path
+
+current_path = Path.cwd()
 
 # Assicurati di avere questo file creato, o adatta il nome
-from scenes.good_ending_scene import GoodEnding 
+from frontend.scenes.good_ending_scene import GoodEnding 
 
 class MapScene:
     def __init__(self, manager):
         self.manager = manager
 
-        self.smoke_img = pygame.image.load("assets/smoke.png").convert_alpha()
+        self.smoke_img = pygame.image.load(f"{current_path}/frontend/assets/smoke.png").convert_alpha()
         # Se    è troppo grande o piccola, ridimensionala così:
         self.smoke_img = pygame.transform.scale(self.smoke_img, (200, 200))
         
-        img_originale = pygame.image.load("assets/map.png").convert_alpha()
+        img_originale = pygame.image.load(f"{current_path}/frontend/assets/map.png").convert_alpha()
         self.map = pygame.transform.scale(img_originale, (1000, 600))
 
         self.barA = WaterBar(50, 50)
@@ -23,7 +27,7 @@ class MapScene:
         self.timer = 0
         self.font = pygame.font.SysFont(None, 30)
 
-        from ui.button import Button
+        from frontend.ui.button import Button
         
         # Bottoni Scelta Iniziale
         self.buttonA = Button("Paese A perde acqua", 300, 250, 200, 50)
@@ -43,12 +47,12 @@ class MapScene:
         
         self.characters = [
             # Primo volto in alto a sinistra (0, 0)
-            Character("assets/villageA_chars.png", 150, 400, rect=pygame.Rect(0, 0, 150, 150)),
+            Character(f"{current_path}/frontend/assets/villageA_chars.png", 150, 400, rect=pygame.Rect(0, 0, 150, 150)),
             # Secondo volto (150, 0)
-            Character("assets/villageA_chars.png", 220, 400, rect=pygame.Rect(150, 0, 150, 150)), 
+            Character(f"{current_path}/frontend/assets/villageA_chars.png", 220, 400, rect=pygame.Rect(150, 0, 150, 150)), 
         ]
 
-        self.smoke_img = pygame.image.load("assets/smoke.png").convert_alpha()
+        self.smoke_img = pygame.image.load(f"{current_path}/frontend/assets/smoke.png").convert_alpha()
         # Se è troppo grande o piccola, ridimensionala così:
         self.smoke_img = pygame.transform.scale(self.smoke_img, (200, 200))
 
@@ -59,12 +63,12 @@ class MapScene:
             for e in events:
                 if self.buttonA.clicked(e):
                     self.losing_village = "A"
-                    self.char_walker = Character("assets/villageA_chars.png", 150, 400, rect=pygame.Rect(0, 0, 150, 150))
+                    self.char_walker = Character(f"{current_path}/frontend/assets/villageA_chars.png", 150, 400, rect=pygame.Rect(0, 0, 150, 150))
                     self.fase_gioco = "simulazione"
                     
                 if self.buttonB.clicked(e):
                     self.losing_village = "B"
-                    self.char_walker = Character("assets/villageB_chars.png", 850, 400, rect=pygame.Rect(0, 0, 150, 150))
+                    self.char_walker = Character(f"{current_path}/frontend/assets/villageB_chars.png", 850, 400, rect=pygame.Rect(0, 0, 150, 150))
                     self.fase_gioco = "simulazione"
             return
 
@@ -109,9 +113,9 @@ class MapScene:
                     # Prepariamo i personaggi per la rissa
                     # Creiamo un secondo personaggio che corre dal lato opposto
                     if self.losing_village == "B":
-                        self.enemy_char = Character("assets/villageA_chars.png", 150, 400, rect=pygame.Rect(0, 0, 150, 150))
+                        self.enemy_char = Character(f"{current_path}/frontend/assets/villageA_chars.png", 150, 400, rect=pygame.Rect(0, 0, 150, 150))
                     else:
-                        self.enemy_char = Character("assets/villageB_chars.png", 850, 400, rect=pygame.Rect(0, 0, 150, 150))
+                        self.enemy_char = Character(f"{current_path}/frontend/assets/villageB_chars.png", 850, 400, rect=pygame.Rect(0, 0, 150, 150))
                     
                     self.fase_gioco = "conflitto"
                     self.timer = 0

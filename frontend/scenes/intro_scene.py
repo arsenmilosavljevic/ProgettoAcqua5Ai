@@ -1,5 +1,5 @@
 import pygame
-from scenes.map_scene import MapScene
+from frontend.scenes.map_scene import MapScene
 
 class IntroScene:
 

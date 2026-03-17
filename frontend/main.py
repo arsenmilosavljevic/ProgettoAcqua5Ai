@@ -1,9 +1,10 @@
 import pygame
 import sys
 
-from scene_manager import SceneManager
-from game_state import GameState
-from settings import *
+from frontend.scene_manager import SceneManager
+from frontend.game_state import GameState
+from frontend.settings import *
+from backend import *
 
 pygame.init()
 
@@ -14,6 +15,11 @@ clock = pygame.time.Clock()
 
 manager = SceneManager()
 state = GameState()
+
+village_a = Village("A", 300, 100, 2, 100)
+village_b = Village("B", 300, 100, 2, 100)
+
+global_manager = GlobalManager(2000)
 
 while True:
 

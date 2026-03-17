@@ -1,4 +1,4 @@
-from scenes.intro_scene import IntroScene
+from frontend.scenes.intro_scene import IntroScene
 
 class SceneManager:
 

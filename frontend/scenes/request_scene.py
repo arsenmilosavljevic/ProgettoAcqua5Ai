@@ -1,7 +1,7 @@
 import pygame
-from ui.button import Button
-from scenes.good_ending_scene import GoodEnding
-from scenes.war_scene import WarScene
+from frontend.ui.button import Button
+from frontend.scenes.good_ending_scene import GoodEnding
+from frontend.scenes.war_scene import WarScene
 
 class RequestScene:
 
