@@ -167,7 +167,7 @@ class MapScene:
                 state.humor_a = Village.VILLAGGIO_A.morale
                 state.humor_b = Village.VILLAGGIO_B.morale
 
-                if Village.VILLAGGIO_A.num_persone == 0 and Village.VILLAGGIO_B.num_persone == 0:
+                if Village.VILLAGGIO_A.estinto or Village.VILLAGGIO_B.estinto:
                     from frontend.scenes.bad_ending_scene import BadEnding
                     self.manager.change(BadEnding(self.manager))
 
