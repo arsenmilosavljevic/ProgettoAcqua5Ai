@@ -181,7 +181,7 @@ class MapScene:
 
     def draw(self, screen, state):
 
-        self.title_font = pygame.font.SysFont("Arial", 16)
+        self.title_font = pygame.font.SysFont("Arial", 18, bold=True)
 
         if self.fase_gioco == "scelta_iniziale":
             screen.fill((30, 30, 40))
@@ -194,9 +194,9 @@ class MapScene:
         screen.blit(self.map, (0, 0))
 
         self.barA.draw(screen, state.water_a)
-        screen.blit(self.title_font.render("water", True, (255, 255, 255)), (50, 32))
+        screen.blit(self.title_font.render("water", True, (255, 255, 255)), (50, 28))
         self.barB.draw(screen, state.water_b)
-        screen.blit(self.title_font.render("water", True, (255, 255, 255)), (750, 32))
+        screen.blit(self.title_font.render("water", True, (255, 255, 255)), (750, 28))
 
         self.humor_barA.draw(screen, state.humor_a)
         screen.blit(self.title_font.render("felicità", True, (255, 255, 255)), (50, 70))

@@ -50,9 +50,13 @@ class GlobalManager:
             Village.VILLAGGIO_A.num_persone -=  int(soldier_a/100*random.randint(40, 80))
             Village.VILLAGGIO_B.num_persone -= soldier_b
             self.choice = ChoiceEnum.ALL_TO_A
+            Village.VILLAGGIO_A.morale += 10
+            Village.VILLAGGIO_A.morale -= 10
         else:
             Village.VILLAGGIO_B.num_persone -=  int(soldier_b/100*random.randint(40, 80))
             Village.VILLAGGIO_A.num_persone -= soldier_a
             self.choice = ChoiceEnum.ALL_TO_B
+            Village.VILLAGGIO_B.morale += 10
+            Village.VILLAGGIO_A.morale -= 10
 
         
