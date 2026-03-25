@@ -2,6 +2,7 @@ import pygame
 from frontend.ui.water_bar import WaterBar
 from frontend.ui.humor_bar import HumorBar
 from frontend.sprites.character import Character
+from frontend.sprites.village_population import VillagePopulation   # <-- NUOVO
 from frontend.settings import *
 
 from backend.GlobalManager import GlobalManager
@@ -14,8 +15,9 @@ current_path = Path.cwd()
 
 from frontend.scenes.good_ending_scene import GoodEnding
 
+
 class MapScene:
-    def __init__(self, manager, intro_choice=None):  # <-- aggiunto intro_choice
+    def __init__(self, manager, intro_choice=None):
         self.manager = manager
 
         self.smoke_img = pygame.image.load(f"{current_path}/frontend/assets/smoke.png").convert_alpha()
@@ -44,14 +46,32 @@ class MapScene:
         self.village_b = None
         self.char_walker = None
 
-        self.characters = [
-            Character(f"{current_path}/frontend/assets/villageA_chars.png", 150, 400, rect=pygame.Rect(0, 0, 150, 150)),
-            Character(f"{current_path}/frontend/assets/villageA_chars.png", 220, 400, rect=pygame.Rect(150, 0, 150, 150)),
-        ]
+        # ------------------------------------------------------------------
+        # Folle animate – sostituiscono i vecchi characters statici
+        # Le aree dei villaggi sono i rettangoli sinistro/destro della mappa
+        # ------------------------------------------------------------------
+        initial_pop = Village.VILLAGGIO_A.num_persone  # stessa di partenza per entrambi
+
+        # In map_scene.py
+        self.crowd_a = VillagePopulation(
+            sheet_path=f"{current_path}/frontend/assets/villageA_chars.png",
+            area_rect=pygame.Rect(20, 380, 300, 180),
+            initial_pop=initial_pop,
+            sprite_size=80,
+            mask_path=f"{current_path}/frontend/assets/mask_villageA.png", # Ora funziona!
+        )
+
+        self.crowd_b = VillagePopulation(
+            sheet_path=f"{current_path}/frontend/assets/villageB_chars.png",
+            area_rect=pygame.Rect(680, 380, 300, 180),
+            initial_pop=initial_pop,
+            sprite_size=80,
+            mask_path=None, # Metti None o il path per il villaggio B
+        )
+
 
         # --- Gestione scelta dall'IntroScene ---
         if intro_choice == 0:
-            # Collaborazione: entrambi condividono da subito
             GlobalManager.INSTANCE.choice = ChoiceEnum.SHARED
             self.char_walker = Character(
                 f"{current_path}/frontend/assets/villageA_chars.png",
@@ -60,7 +80,6 @@ class MapScene:
             self.fase_gioco = "collaborazione"
 
         elif intro_choice == 1:
-            # Villaggio A ha tutta l'acqua → B soffre, parte da destra
             GlobalManager.INSTANCE.choice = ChoiceEnum.ALL_TO_A
             self.char_walker = Character(
                 f"{current_path}/frontend/assets/villageB_chars.png",
@@ -69,7 +88,6 @@ class MapScene:
             self.fase_gioco = "simulazione"
 
         elif intro_choice == 2:
-            # Villaggio B ha tutta l'acqua → A soffre, parte da sinistra
             GlobalManager.INSTANCE.choice = ChoiceEnum.ALL_TO_B
             self.char_walker = Character(
                 f"{current_path}/frontend/assets/villageA_chars.png",
@@ -78,13 +96,20 @@ class MapScene:
             self.fase_gioco = "simulazione"
 
         else:
-            # Nessuna scelta dall'intro: mostra la schermata classica
             self.fase_gioco = "scelta_iniziale"
+
+    # ------------------------------------------------------------------
+    # UPDATE
+    # ------------------------------------------------------------------
 
     def update(self, events, state):
 
         state.humor_a = Village.VILLAGGIO_A.morale
         state.humor_b = Village.VILLAGGIO_B.morale
+
+        # Aggiorna le folle ogni frame (animazione + riduzione proporzionale)
+        self.crowd_a.update(Village.VILLAGGIO_A.num_persone)
+        self.crowd_b.update(Village.VILLAGGIO_B.num_persone)
 
         if self.fase_gioco == "scelta_iniziale":
             for e in events:
@@ -154,8 +179,6 @@ class MapScene:
                 state.year = GlobalManager.INSTANCE.time.year
                 self.timer = 0
 
-                #if self.losing_village == "A": state.water_a -= 10
-                #if self.losing_village == "B": state.water_b -= 10
                 state.water_a = Village.VILLAGGIO_A.riserva_acqua
                 state.water_b = Village.VILLAGGIO_B.riserva_acqua
                 state.humor_a = Village.VILLAGGIO_A.morale
@@ -179,35 +202,9 @@ class MapScene:
                 else:
                     self.manager.change(GoodEnding(self.manager))
 
-    def _draw_bars_panel(self, screen, x, y, width, height, label_water, label_humor,
-                         water_val, humor_val, bar_water, bar_humor):
-        """
-        Pannello 1: sfondo nero semi-trasparente con bordo bianco.
-        Contiene scritta + barra Water e scritta + barra Felicità.
-        """
-        # Sfondo semi-trasparente
-        panel_surf = pygame.Surface((width, height), pygame.SRCALPHA)
-        panel_surf.fill((0, 0, 0, 140))
-        screen.blit(panel_surf, (x, y))
- 
-        # Bordo bianco
-        pygame.draw.rect(screen, (255, 255, 255), (x, y, width, height), 2, border_radius=6)
- 
-        label_font = pygame.font.SysFont("Arial", 13)
- 
-        # --- Riga WATER ---
-        water_label_surf = label_font.render(label_water, True, (100, 200, 255))
-        screen.blit(water_label_surf, (x + 8, y + 8))
-        bar_water.x = x + 8
-        bar_water.y = y + 26
-        bar_water.draw(screen, water_val)
- 
-        # --- Riga FELICITA ---
-        humor_label_surf = label_font.render(label_humor, True, (255, 220, 80))
-        screen.blit(humor_label_surf, (x + 8, y + 50))
-        bar_humor.x = x + 8
-        bar_humor.y = y + 68
-        bar_humor.draw(screen, humor_val)
+    # ------------------------------------------------------------------
+    # DRAW
+    # ------------------------------------------------------------------
 
     def draw(self, screen, state):
 
@@ -258,8 +255,12 @@ class MapScene:
         screen.blit(self.font.render(f"Popolazione: {numero_persone_a}", True, (255, 255, 255)), (50, 110))
         screen.blit(self.font.render(f"Popolazione: {numero_persone_b}", True, (255, 255, 255)), (750, 110))
 
-        for c in self.characters:
-            c.draw(screen)
+        # ------------------------------------------------------------------
+        # Disegna le folle animate (sostituiscono i vecchi characters statici)
+        # Le folle sono sempre visibili tranne nella fase di scelta iniziale
+        # ------------------------------------------------------------------
+        self.crowd_a.draw(screen)
+        self.crowd_b.draw(screen)
 
         if self.fase_gioco in ["camminata", "domanda", "collaborazione"]:
             self.char_walker.draw(screen)
@@ -271,6 +272,7 @@ class MapScene:
             self.btn_guerra.draw(screen)
 
         if self.fase_gioco == "conflitto":
+            self.char_walker.draw(screen)
             self.enemy_char.draw(screen)
             if abs(self.char_walker.x - self.enemy_char.x) < 100:
                 import random
